@@ -1,18 +1,11 @@
-const { json } = require("body-parser");
+const postController = require("../controllers/post");
+
 const express = require("express");
 
 const router = express.Router();
 
-router.get("/posts", (req, res, next) => {
-  res.status(200).json({ posts: ["hello world"] });
-});
+router.get("/posts", postController.getPosts);
 
-router.post("/posts", (req, res, next) => {
-  console.log(req.body);
-  const { title, user_name, content } = req.body;
-  return res
-    .status(201)
-    .json({ message: "Post created", post: { title, user_name, content } });
-});
+router.post("/posts", postController.postPosts);
 
 module.exports = router;
