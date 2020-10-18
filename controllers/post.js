@@ -1,11 +1,21 @@
 const mongodb = require("mongodb");
 const Post = require("../models/post");
+const { validationResult } = require("express-validator");
 
-exports.getPosts = (req, res, next) => {
+exports.getPosts = (req, res) => {
   res.status(200).json({ posts: ["hello world"] });
 };
 
-exports.postPosts = (req, res, next) => {
+exports.postPosts = (req, res) => {
+  const errorFormatter = ({ location, msg, param }) => {
+    return `${param} ${msg}`;
+  };
+  const errors = validationResult(req).formatWith(errorFormatter);
+  if (!errors.isEmpty()) {
+    return res
+      .status(422)
+      .json({ message: "Validation Failed!", errors: errors.array() });
+  }
   const { title, content } = req.body;
 
   let post = new Post({
