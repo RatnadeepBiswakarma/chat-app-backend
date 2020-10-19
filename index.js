@@ -22,6 +22,6 @@ mongoose.set("useUnifiedTopology", true);
 mongoose.set("useNewUrlParser", true);
 console.log("Connecting...");
 mongoose.connect(MONGODB_URI).then((result) => {
-  console.log("App is ready to use.");
+  console.log("Connected! ✔");
   app.listen(5050);
 });

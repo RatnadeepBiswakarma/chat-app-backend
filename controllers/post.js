@@ -1,9 +1,29 @@
 const mongodb = require("mongodb");
 const Post = require("../models/post");
 const { validationResult } = require("express-validator");
+const LIMIT = 10;
+const SKIP = 0;
 
 exports.getPosts = (req, res) => {
-  res.status(200).json({ posts: ["hello world"] });
+  const dbQueryOptions = { skip: SKIP, limit: LIMIT, sort: "-updated_at" };
+  {
+    const queryParams = req.query;
+    if (queryParams.limit) {
+      dbQueryOptions.limit = parseInt(queryParams.limit);
+    }
+    if (queryParams.skip) {
+      dbQueryOptions.skip = parseInt(queryParams.skip);
+    }
+    if (queryParams.sort_by) {
+      dbQueryOptions.sort = queryParams.sort_by;
+    }
+  }
+
+  const query = Post.find();
+  query.setOptions(dbQueryOptions);
+  query.exec().then((posts) => {
+    res.status(200).json({ posts: posts ? posts : [] });
+  });
 };
 
 exports.postPosts = (req, res) => {
