@@ -20,6 +20,7 @@ app.use(mainRoute);
 
 mongoose.set("useUnifiedTopology", true);
 mongoose.set("useNewUrlParser", true);
+mongoose.set('useCreateIndex', true);
 console.log("Connecting...");
 mongoose.connect(MONGODB_URI).then((result) => {
   console.log("Connected! ✔");

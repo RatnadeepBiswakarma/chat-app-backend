@@ -10,4 +10,6 @@ const postSchema = new Schema(
   { timestamps: { createdAt: "created_at", updatedAt: "updated_at" } }
 );
 
+postSchema.index({ title: "text", content: "text" });
+
 module.exports = mongoose.model("Post", postSchema);
