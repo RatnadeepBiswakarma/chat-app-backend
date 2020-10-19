@@ -22,4 +22,6 @@ router.post(
   postController.postPosts
 );
 
+router.get("/posts/:postId", postController.getPostById);
+
 module.exports = router;

@@ -32,6 +32,19 @@ exports.getPosts = (req, res) => {
   });
 };
 
+exports.getPostById = (req, res) => {
+  if (mongodb.ObjectID.isValid(req.params.postId)) {
+    Post.findById(new mongodb.ObjectId(req.params.postId)).then((post) => {
+      if (post) {
+        return res.status(200).json({ post });
+      }
+      return res.status(404).json({ message: "Post not found!" });
+    });
+  } else {
+    return res.status(404).json({ message: "Post id is not valid!" });
+  }
+};
+
 exports.postPosts = (req, res) => {
   const errorFormatter = ({ location, msg, param }) => {
     return `${param} ${msg}`;
