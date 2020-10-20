@@ -1,4 +1,5 @@
 const postController = require("../controllers/post");
+const userController = require("../controllers/user");
 const { body, check } = require("express-validator");
 
 const express = require("express");
@@ -23,5 +24,7 @@ router.post(
 );
 
 router.get("/posts/:postId", postController.getPostById);
+
+router.post("/users", userController.signupUser);
 
 module.exports = router;
