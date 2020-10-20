@@ -25,6 +25,25 @@ router.post(
 
 router.get("/posts/:postId", postController.getPostById);
 
-router.post("/users", userController.signupUser);
+router.post(
+  "/users",
+  [
+    check("first_name").exists().withMessage("is required"),
+    body("first_name")
+      .isLength({ min: 1 })
+      .withMessage("must be at least 1 character."),
+    check("last_name").exists().withMessage("is required"),
+    body("last_name")
+      .isLength({ min: 1 })
+      .withMessage("must be at least 1 character."),
+    check("email").exists().withMessage("is required."),
+    body("email").isEmail().withMessage("is not a valid email."),
+    check("password").exists().withMessage("is required."),
+    body("password")
+      .isLength({ min: 6 })
+      .withMessage("must be at least 6 characters."),
+  ],
+  userController.signupUser
+);
 
 module.exports = router;

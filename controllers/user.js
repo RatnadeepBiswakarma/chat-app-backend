@@ -1,6 +1,16 @@
 const User = require("../models/user");
+const { validationResult } = require("express-validator");
 
 exports.signupUser = (req, res, next) => {
+  const errorFormatter = ({ location, msg, param }) => {
+    return `${param} ${msg}`;
+  };
+  const errors = validationResult(req).formatWith(errorFormatter);
+  if (!errors.isEmpty()) {
+    return res
+      .status(422)
+      .json({ message: "Validation Failed!", errors: errors.array() });
+  }
   const { first_name, last_name, email, password } = req.body;
   User.findOne({ email }).then((user) => {
     if (user) {
