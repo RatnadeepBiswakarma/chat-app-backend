@@ -6,6 +6,7 @@
   "author": "ratnadeep",
   "scripts": {
     "start": "nodemon index.js",
+    "serve": "nodemon index.js",
     "start-server": "node index.js"
   },
   "dependencies": {
