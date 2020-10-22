@@ -46,4 +46,6 @@ router.post(
   userController.signupUser
 );
 
+router.patch("/posts/:postId", postController.patchPost);
+
 module.exports = router;

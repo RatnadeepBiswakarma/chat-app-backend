@@ -68,3 +68,26 @@ exports.postPosts = (req, res) => {
     return res.status(201).json({ message: "Post created", result });
   });
 };
+
+exports.patchPost = (req, res) => {
+  const postId = req.params.postId;
+  if (!mongodb.ObjectID.isValid(req.params.postId)) {
+    return res.status(404).json({ message: "Post not found with this id." });
+  }
+  const { title, content } = req.body;
+  Post.findOneAndUpdate({ _id: postId }, { title, content })
+    .then((result) => {
+      if (result) {
+        return res.status(200).json({ message: "Post updated!" });
+      }
+      return res.status(404).json({ message: "Post not found!" });
+    })
+    .catch((err) => {
+      return res
+        .status(500)
+        .json({
+          message:
+            "Something went wrong. We're on it, please try after sometime",
+        });
+    });
+};
