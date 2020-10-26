@@ -28,12 +28,15 @@ exports.signupUser = (req, res, next) => {
     newUser
       .save()
       .then((user) => {
+        const { first_name, last_name, email, _id } = user;
         const token = jwt.sign(
           { userId: user._id.toString() },
           "twinkletwinklelittlestart",
           { expiresIn: "7 days" }
         );
-        return res.status(201).json({ user, token });
+        return res
+          .status(201)
+          .json({ user: { first_name, last_name, email, _id }, token });
       })
       .catch(() => {
         return res.status(500).json({
