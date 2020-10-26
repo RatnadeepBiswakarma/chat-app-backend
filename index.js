@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 const mainRoute = require("./routes/index.js");
 const bodyParser = require("body-parser");
 const MONGODB_URI =
-  "mongodb://127.0.0.1:27017/twitter";
+  "mongodb://127.0.0.1:27017/posts-app";
 const app = express();
 
 app.use((req, res, next) => {

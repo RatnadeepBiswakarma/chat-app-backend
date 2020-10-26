@@ -1,5 +1,6 @@
 const User = require("../models/user");
 const { validationResult } = require("express-validator");
+const jwt = require("jsonwebtoken");
 
 exports.signupUser = (req, res, next) => {
   const errorFormatter = ({ location, msg, param }) => {
@@ -27,7 +28,12 @@ exports.signupUser = (req, res, next) => {
     newUser
       .save()
       .then((user) => {
-        return res.status(201).json({ user });
+        const token = jwt.sign(
+          { userId: user._id.toString() },
+          "twinkletwinklelittlestart",
+          { expiresIn: "7 days" }
+        );
+        return res.status(201).json({ user, token });
       })
       .catch(() => {
         return res.status(500).json({
