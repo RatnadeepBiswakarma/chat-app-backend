@@ -75,7 +75,7 @@ exports.patchPost = (req, res) => {
     return res.status(404).json({ message: "Post not found with this id." });
   }
   const { title, content } = req.body;
-  Post.findOneAndUpdate({ _id: postId }, { title, content })
+  Post.findOneAndUpdate({ _id: postId, userId: req.userId }, { title, content })
     .then((result) => {
       if (result) {
         return res.status(200).json({ message: "Post updated!" });
