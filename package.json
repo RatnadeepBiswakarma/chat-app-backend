@@ -20,6 +20,7 @@
     "nodemon": "^2.0.4"
   },
   "devDependencies": {
+    "eslint": "^7.12.1",
     "lint-staged": "^10.5.0",
     "pre-commit": "^1.2.2"
   },
