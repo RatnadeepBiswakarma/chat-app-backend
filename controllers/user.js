@@ -1,7 +1,7 @@
 const User = require("../models/user");
 const { validationResult } = require("express-validator");
 const jwt = require("jsonwebtoken");
-jwtSecret = "twinkletwinklelittlestart";
+const jwtSecret = "twinkletwinklelittlestart";
 
 const errorFormatter = ({ location, msg, param }) => {
   return `${param} ${msg}`;

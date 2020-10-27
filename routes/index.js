@@ -1,15 +1,16 @@
+const express = require("express");
+const router = express.Router();
+
+const auth = require("../middlewares/auth");
 const postController = require("../controllers/post");
 const userController = require("../controllers/user");
 const { body, check } = require("express-validator");
-
-const express = require("express");
-
-const router = express.Router();
 
 router.get("/posts", postController.getPosts);
 
 router.post(
   "/posts",
+  auth,
   [
     check("title").exists().withMessage("is required."),
     body("title")
@@ -59,6 +60,6 @@ router.post(
   userController.signupUser
 );
 
-router.patch("/posts/:postId", postController.patchPost);
+router.patch("/posts/:postId", auth, postController.patchPost);
 
 module.exports = router;
