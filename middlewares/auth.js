@@ -1,5 +1,5 @@
 const jwt = require("jsonwebtoken");
-const jwtSecret = "twinkletwinklelittlestart";
+const { jwtSecret } = require("../config");
 
 module.exports = (req, res, next) => {
   const token = req.get("x-access-token");

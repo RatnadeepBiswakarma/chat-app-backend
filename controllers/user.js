@@ -1,13 +1,13 @@
 const User = require("../models/user");
 const { validationResult } = require("express-validator");
 const jwt = require("jsonwebtoken");
-const jwtSecret = "twinkletwinklelittlestart";
+const { jwtSecret } = require("../config");
 
-const errorFormatter = ({ location, msg, param }) => {
+const errorFormatter = ({ msg, param }) => {
   return `${param} ${msg}`;
 };
 
-exports.signupUser = (req, res, next) => {
+exports.signupUser = (req, res) => {
   const errors = validationResult(req).formatWith(errorFormatter);
   if (!errors.isEmpty()) {
     return res
@@ -47,7 +47,7 @@ exports.signupUser = (req, res, next) => {
   });
 };
 
-exports.postLogin = (req, res, next) => {
+exports.postLogin = (req, res) => {
   const errors = validationResult(req).formatWith(errorFormatter);
   if (!errors.isEmpty()) {
     return res

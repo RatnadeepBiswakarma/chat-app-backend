@@ -1,13 +1,11 @@
-const myEnv = require("dotenv").config({ path: ".env.development.local" });
-const dotenvExpand = require("dotenv-expand");
-dotenvExpand(myEnv);
-
 const express = require("express");
 const mongoose = require("mongoose");
 const mainRoute = require("./routes/index.js");
 const bodyParser = require("body-parser");
 const MONGODB_URI = "mongodb://127.0.0.1:27017/posts-app";
 const app = express();
+
+const { port } = require("./config");
 
 app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
@@ -28,5 +26,5 @@ mongoose.set("useFindAndModify", false);
 console.log("Connecting...");
 mongoose.connect(MONGODB_URI).then(() => {
   console.log("Connected! ✔");
-  app.listen(5050);
+  app.listen(port);
 });
