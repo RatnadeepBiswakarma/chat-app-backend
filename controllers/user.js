@@ -1,11 +1,13 @@
 const User = require("../models/user");
 const { validationResult } = require("express-validator");
 const jwt = require("jsonwebtoken");
+jwtSecret = "twinkletwinklelittlestart";
+
+const errorFormatter = ({ location, msg, param }) => {
+  return `${param} ${msg}`;
+};
 
 exports.signupUser = (req, res, next) => {
-  const errorFormatter = ({ location, msg, param }) => {
-    return `${param} ${msg}`;
-  };
   const errors = validationResult(req).formatWith(errorFormatter);
   if (!errors.isEmpty()) {
     return res
@@ -29,11 +31,9 @@ exports.signupUser = (req, res, next) => {
       .save()
       .then((user) => {
         const { first_name, last_name, email, _id } = user;
-        const token = jwt.sign(
-          { userId: user._id.toString() },
-          "twinkletwinklelittlestart",
-          { expiresIn: "7 days" }
-        );
+        const token = jwt.sign({ userId: _id.toString() }, jwtSecret, {
+          expiresIn: "7 days",
+        });
         return res
           .status(201)
           .json({ user: { first_name, last_name, email, _id }, token });
@@ -44,5 +44,27 @@ exports.signupUser = (req, res, next) => {
             "Account creation failed! We're looking into it, Please try again in sometime.",
         });
       });
+  });
+};
+
+exports.postLogin = (req, res, next) => {
+  const errors = validationResult(req).formatWith(errorFormatter);
+  if (!errors.isEmpty()) {
+    return res
+      .status(422)
+      .json({ message: "Validation Failed!", errors: errors.array() });
+  }
+  const { email, password } = req.body;
+  User.findOne({ email, password }).then((user) => {
+    if (!user) {
+      return res.status(404).json({ message: "Invalid email or password." });
+    }
+    const { first_name, last_name, email, _id } = user;
+    const token = jwt.sign({ userId: _id.toString() }, jwtSecret, {
+      expiresIn: "7 days",
+    });
+    return res
+      .status(200)
+      .json({ user: { first_name, last_name, email, _id }, token });
   });
 };

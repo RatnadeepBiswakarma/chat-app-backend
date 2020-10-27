@@ -26,6 +26,19 @@ router.post(
 router.get("/posts/:postId", postController.getPostById);
 
 router.post(
+  "/users/login",
+  [
+    check("email").exists().withMessage("is required."),
+    body("email").isEmail().withMessage("is not a valid email."),
+    check("password").exists().withMessage("is required."),
+    body("password")
+      .isLength({ min: 6 })
+      .withMessage("must be at least 6 characters."),
+  ],
+  userController.postLogin
+);
+
+router.post(
   "/users",
   [
     check("first_name").exists().withMessage("is required"),
