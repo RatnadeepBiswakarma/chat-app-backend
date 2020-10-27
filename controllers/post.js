@@ -62,7 +62,7 @@ exports.postPosts = (req, res) => {
     content,
     created_on: new Date(),
     updated_on: new Date(),
-    userId: new mongodb.ObjectId("5f17e109a02cc497c249ba22"), // hard coded for now
+    userId: req.userId,
   });
   post.save().then((result) => {
     return res.status(201).json({ message: "Post created", result });
@@ -83,11 +83,8 @@ exports.patchPost = (req, res) => {
       return res.status(404).json({ message: "Post not found!" });
     })
     .catch((err) => {
-      return res
-        .status(500)
-        .json({
-          message:
-            "Something went wrong. We're on it, please try after sometime",
-        });
+      return res.status(500).json({
+        message: "Something went wrong. We're on it, please try after sometime",
+      });
     });
 };
