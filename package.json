@@ -7,7 +7,8 @@
   "scripts": {
     "start": "nodemon index.js",
     "serve": "nodemon index.js",
-    "start-server": "node index.js"
+    "start-server": "node index.js",
+    "lint-files": "yarn lint-staged"
   },
   "dependencies": {
     "body-parser": "^1.19.0",
@@ -17,5 +18,15 @@
     "mongodb": "^3.6.2",
     "mongoose": "^5.10.9",
     "nodemon": "^2.0.4"
+  },
+  "devDependencies": {
+    "lint-staged": "^10.5.0",
+    "pre-commit": "^1.2.2"
+  },
+  "pre-commit": "lint-files",
+  "lint-staged": {
+    "*.js": [
+      "yarn eslint"
+    ]
   }
 }
