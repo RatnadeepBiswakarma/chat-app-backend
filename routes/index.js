@@ -1,12 +1,12 @@
-const express = require("express");
-const router = express.Router();
+const express = require("express")
+const router = express.Router()
 
-const auth = require("../middlewares/auth");
-const postController = require("../controllers/post");
-const userController = require("../controllers/user");
-const { body, check } = require("express-validator");
+const auth = require("../middlewares/auth")
+const postController = require("../controllers/post")
+const userController = require("../controllers/user")
+const { body, check } = require("express-validator")
 
-router.get("/posts", postController.getPosts);
+router.get("/posts", postController.getPosts)
 
 router.post(
   "/posts",
@@ -22,9 +22,9 @@ router.post(
       .withMessage("must be at least 10 characters long."),
   ],
   postController.postPosts
-);
+)
 
-router.get("/posts/:postId", postController.getPostById);
+router.get("/posts/:postId", postController.getPostById)
 
 router.post(
   "/users/login",
@@ -37,7 +37,7 @@ router.post(
       .withMessage("must be at least 6 characters."),
   ],
   userController.postLogin
-);
+)
 
 router.post(
   "/users",
@@ -58,7 +58,7 @@ router.post(
       .withMessage("must be at least 6 characters."),
   ],
   userController.signupUser
-);
+)
 
 router.patch(
   "/posts/:postId",
@@ -74,6 +74,6 @@ router.patch(
       .withMessage("must be at least 10 characters long."),
   ],
   postController.patchPost
-);
+)
 
-module.exports = router;
+module.exports = router
