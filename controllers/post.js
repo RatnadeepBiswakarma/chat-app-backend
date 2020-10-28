@@ -82,9 +82,18 @@ exports.postPosts = (req, res) => {
     updated_on: new Date(),
     userId: req.userId,
   });
-  post.save().then(result => {
-    return res.status(201).json({ message: "Post created", result });
-  });
+  post
+    .save()
+    .then(post => {
+      return post.populate("userId").execPopulate();
+    })
+    .then(post => {
+      post = post.toObject();
+      /* just to give the data a better shape */
+      post.user = prepareUserPublicProfile(post.userId);
+      Reflect.deleteProperty(post, "userId");
+      return res.status(201).json({ message: "Post created", post });
+    });
 };
 
 exports.patchPost = (req, res) => {
