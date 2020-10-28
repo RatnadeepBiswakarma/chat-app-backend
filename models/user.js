@@ -1,5 +1,5 @@
-const mongoose = require("mongoose");
-const Schema = mongoose.Schema;
+const mongoose = require("mongoose")
+const Schema = mongoose.Schema
 
 const userSchema = new Schema(
   {
@@ -20,9 +20,20 @@ const userSchema = new Schema(
       required: true,
     },
   },
-  { timestamps: { createdAt: "created_at", updatedAt: "updated_at" } }
-);
+  {
+    timestamps: { createdAt: "created_at", updatedAt: "updated_at" },
+    versionKey: false,
+    // change _id to id
+    toObject: {
+      transform(doc, ret) {
+        const id = ret._id
+        Reflect.deleteProperty(ret, "_id")
+        ret.id = id
+      },
+    },
+  }
+)
 
-userSchema.index({ first_name: "text", last_name: "text", email: "text" });
+userSchema.index({ first_name: "text", last_name: "text", email: "text" })
 
-module.exports = mongoose.model("User", userSchema);
+module.exports = mongoose.model("User", userSchema)

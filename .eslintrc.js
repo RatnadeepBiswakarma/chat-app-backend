@@ -250,7 +250,6 @@ module.exports = {
         "require-await": "error",
         "require-jsdoc": "error",
         "rest-spread-spacing": "error",
-        "semi": "error",
         "semi-spacing": "error",
         "semi-style": [
             "error",
@@ -260,7 +259,6 @@ module.exports = {
         "sort-keys": "off",
         "sort-vars": "error",
         "space-before-blocks": "error",
-        "space-before-function-paren": "error",
         "space-in-parens": [
             "error",
             "never"

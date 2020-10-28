@@ -31,13 +31,16 @@ exports.getPosts = (req, res) => {
   /* lean() returns plain js object so that we modify freely
     it also removes other mongoose methods i.e. save() */
   // populate user details
-  query.lean().populate("userId");
+  query.populate("userId");
   query.exec().then(posts => {
     if (posts.length > 0) {
+      posts = Array.from(posts).map(p => p.toObject());
       /* just to give the data a better shape */
       posts.forEach(post => {
-        post.user = prepareUserPublicProfile(post.userId);
-        Reflect.deleteProperty(post, "userId");
+        if (post.userId) {
+          post.user = prepareUserPublicProfile(post.userId);
+          Reflect.deleteProperty(post, "userId");
+        }
       });
     }
     res.status(200).json({ posts: posts ? posts : [] });
@@ -47,10 +50,10 @@ exports.getPosts = (req, res) => {
 exports.getPostById = (req, res) => {
   if (mongodb.ObjectID.isValid(req.params.postId)) {
     Post.findById(new mongodb.ObjectId(req.params.postId))
-      .lean()
       .populate("userId")
       .then(post => {
         if (post) {
+          post = post.toObject();
           /* just to give the data a better shape */
           post.user = prepareUserPublicProfile(post.userId);
           Reflect.deleteProperty(post, "userId");
@@ -107,9 +110,10 @@ exports.patchPost = (req, res) => {
     { title, content },
     { new: true }
   )
-    .then(result => {
-      if (result) {
-        return res.status(200).json({ message: "Post updated!", post: result });
+    .then(post => {
+      if (post) {
+        post = post.toObject()
+        return res.status(200).json({ message: "Post updated!", post });
       }
       return res.status(404).json({ message: "Post not found!" });
     })

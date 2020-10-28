@@ -15,7 +15,7 @@ exports.signupUser = (req, res) => {
       .json({ message: "Validation Failed!", errors: errors.array() });
   }
   const { first_name, last_name, email, password } = req.body;
-  User.findOne({ email }).then((user) => {
+  User.findOne({ email }).then(user => {
     if (user) {
       return res.status(200).json({
         message: "Account with this email id already exists, Please login.",
@@ -29,14 +29,12 @@ exports.signupUser = (req, res) => {
     });
     newUser
       .save()
-      .then((user) => {
-        const { first_name, last_name, email, _id } = user;
-        const token = jwt.sign({ userId: _id.toString() }, jwtSecret, {
+      .then(user => {
+        user = user.toObject();
+        const token = jwt.sign({ userId: user.id.toString() }, jwtSecret, {
           expiresIn: "7 days",
         });
-        return res
-          .status(201)
-          .json({ user: { first_name, last_name, email, _id }, token });
+        return res.status(201).json({ user, token });
       })
       .catch(() => {
         return res.status(500).json({
@@ -55,16 +53,14 @@ exports.postLogin = (req, res) => {
       .json({ message: "Validation Failed!", errors: errors.array() });
   }
   const { email, password } = req.body;
-  User.findOne({ email, password }).then((user) => {
+  User.findOne({ email, password }).then(user => {
     if (!user) {
       return res.status(404).json({ message: "Invalid email or password." });
     }
-    const { first_name, last_name, email, _id } = user;
-    const token = jwt.sign({ userId: _id.toString() }, jwtSecret, {
+    user = user.toObject();
+    const token = jwt.sign({ userId: user.id.toString() }, jwtSecret, {
       expiresIn: "7 days",
     });
-    return res
-      .status(200)
-      .json({ user: { first_name, last_name, email, _id }, token });
+    return res.status(200).json({ user, token });
   });
 };

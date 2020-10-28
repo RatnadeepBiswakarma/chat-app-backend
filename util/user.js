@@ -1,6 +1,6 @@
 /* return a limited set of data for public calls */
 const prepareUserPublicProfile = data => {
-  const allowedKeys = ["first_name", "last_name", "_id"];
+  const allowedKeys = ["first_name", "last_name", "id"];
   const userObj = {};
   if (typeof data === "object") {
     allowedKeys.forEach(key => {
