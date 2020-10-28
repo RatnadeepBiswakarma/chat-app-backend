@@ -60,6 +60,20 @@ router.post(
   userController.signupUser
 );
 
-router.patch("/posts/:postId", auth, postController.patchPost);
+router.patch(
+  "/posts/:postId",
+  auth,
+  [
+    check("title").exists().withMessage("is required."),
+    body("title")
+      .isLength({ min: 10 })
+      .withMessage("must be at least 10 characters long."),
+    check("content").exists().withMessage("is required."),
+    body("content")
+      .isLength({ min: 10 })
+      .withMessage("must be at least 10 characters long."),
+  ],
+  postController.patchPost
+);
 
 module.exports = router;
