@@ -1,5 +1,6 @@
 const jwt = require("jsonwebtoken");
 const { jwtSecret } = require("../config");
+const User = require("../models/user");
 
 module.exports = (req, res, next) => {
   const token = req.get("x-access-token");
@@ -17,6 +18,14 @@ module.exports = (req, res, next) => {
   if (!decodedToken) {
     return res.status(401).json({ message: "Invalid user token!" });
   }
-  req.userId = decodedToken.userId;
-  next();
+
+  User.findById(decodedToken.userId)
+    .then(user => {
+      if (user) {
+        req.userId = user._id;
+        return next();
+      }
+      return res.status(401).json({ message: "Invalid user token!" });
+    })
+    .catch(err => console.log("error: ", err));
 };
