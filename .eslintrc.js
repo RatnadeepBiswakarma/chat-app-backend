@@ -12,11 +12,10 @@ module.exports = {
         "array-bracket-newline": "error",
         "array-bracket-spacing": "error",
         "array-callback-return": "error",
-        "array-element-newline": "error",
         "arrow-body-style": "off",
         "arrow-parens": [
             "error",
-            "always"
+            "as-needed"
         ],
         "arrow-spacing": [
             "error",
@@ -87,7 +86,6 @@ module.exports = {
         "guard-for-in": "error",
         "handle-callback-err": "off",
         "id-blacklist": "error",
-        "id-length": "error",
         "id-match": "error",
         "implicit-arrow-linebreak": [
             "error",
@@ -122,7 +120,6 @@ module.exports = {
         "max-params": "error",
         "max-statements": "off",
         "max-statements-per-line": "error",
-        "multiline-comment-style": "error",
         "new-parens": "error",
         "newline-after-var": "off",
         "newline-before-return": "off",

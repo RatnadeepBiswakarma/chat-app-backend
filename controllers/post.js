@@ -1,6 +1,7 @@
 const mongodb = require("mongodb");
 const Post = require("../models/post");
 const { validationResult } = require("express-validator");
+const { prepareUserPublicProfile } = require("../util/user");
 const LIMIT = 10;
 const SKIP = 0;
 
@@ -27,19 +28,36 @@ exports.getPosts = (req, res) => {
   }
 
   query.setOptions(dbQueryOptions);
-  query.exec().then((posts) => {
+  /* lean() returns plain js object so that we modify freely
+    it also removes other mongoose methods i.e. save() */
+  // populate user details
+  query.lean().populate("userId");
+  query.exec().then(posts => {
+    if (posts.length > 0) {
+      /* just to give the data a better shape */
+      posts.forEach(post => {
+        post.user = prepareUserPublicProfile(post.userId);
+        Reflect.deleteProperty(post, "userId");
+      });
+    }
     res.status(200).json({ posts: posts ? posts : [] });
   });
 };
 
 exports.getPostById = (req, res) => {
   if (mongodb.ObjectID.isValid(req.params.postId)) {
-    Post.findById(new mongodb.ObjectId(req.params.postId)).then((post) => {
-      if (post) {
-        return res.status(200).json({ post });
-      }
-      return res.status(404).json({ message: "Post not found!" });
-    });
+    Post.findById(new mongodb.ObjectId(req.params.postId))
+      .lean()
+      .populate("userId")
+      .then(post => {
+        if (post) {
+          /* just to give the data a better shape */
+          post.user = prepareUserPublicProfile(post.userId);
+          Reflect.deleteProperty(post, "userId");
+          return res.status(200).json({ post });
+        }
+        return res.status(404).json({ message: "Post not found!" });
+      });
   } else {
     return res.status(404).json({ message: "Post id is not valid!" });
   }
@@ -64,7 +82,7 @@ exports.postPosts = (req, res) => {
     updated_on: new Date(),
     userId: req.userId,
   });
-  post.save().then((result) => {
+  post.save().then(result => {
     return res.status(201).json({ message: "Post created", result });
   });
 };
@@ -80,7 +98,7 @@ exports.patchPost = (req, res) => {
     { title, content },
     { new: true }
   )
-    .then((result) => {
+    .then(result => {
       if (result) {
         return res.status(200).json({ message: "Post updated!", post: result });
       }
