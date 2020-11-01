@@ -123,3 +123,25 @@ exports.patchPost = (req, res) => {
       })
     })
 }
+
+exports.deletePost = (req, res) => {
+  const errorFormatter = ({ msg, param }) => {
+    return `${param} ${msg}`
+  }
+  const errors = validationResult(req).formatWith(errorFormatter)
+  if (!errors.isEmpty()) {
+    return res
+      .status(422)
+      .json({ message: "Validation Failed!", errors: errors.array() })
+  }
+
+  const postId = req.params.postId
+  Post.findByIdAndDelete({ _id: postId, userId: req.userId })
+    .then(result => {
+      if (result) {
+        return res.status(200).json({ message: "Post deleted!" })
+      }
+      return res.status(404).json({ message: "Post not found!" })
+    })
+    .catch(err => console.log(err))
+}

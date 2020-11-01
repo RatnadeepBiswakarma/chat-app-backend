@@ -76,4 +76,11 @@ router.patch(
   postController.patchPost
 )
 
+router.delete(
+  "/posts/:postId/delete",
+  auth,
+  [check("postId").exists().withMessage("is required.")],
+  postController.deletePost
+)
+
 module.exports = router
