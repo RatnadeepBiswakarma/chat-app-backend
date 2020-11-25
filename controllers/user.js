@@ -7,6 +7,28 @@ const errorFormatter = ({ msg, param }) => {
   return `${param} ${msg}`
 }
 
+exports.authUser = (req, res) => {
+  User.findById(req.userId)
+    .then(user => {
+      if (!user) {
+        return res.status(404).json({ message: `User not found` })
+      }
+      user = {
+        first_name: user.first_name,
+        last_name: user.last_name,
+        id: user.id,
+        email: user.email,
+      }
+      return res.status(200).json({ user })
+    })
+    .catch(err => {
+      console.log(err)
+      return res
+        .status(500)
+        .json({ message: "Something went wrong, we're looking into it." })
+    })
+}
+
 exports.signupUser = (req, res) => {
   const errors = validationResult(req).formatWith(errorFormatter)
   if (!errors.isEmpty()) {
@@ -34,6 +56,11 @@ exports.signupUser = (req, res) => {
         const token = jwt.sign({ userId: user.id.toString() }, jwtSecret, {
           expiresIn: "7 days",
         })
+        user = {
+          first_name: user.first_name,
+          last_name: user.last_name,
+          id: user.id,
+        }
         return res.status(201).json({ user, token })
       })
       .catch(() => {

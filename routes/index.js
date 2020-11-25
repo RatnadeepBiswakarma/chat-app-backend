@@ -6,6 +6,8 @@ const postController = require("../controllers/post")
 const userController = require("../controllers/user")
 const { body, check } = require("express-validator")
 
+router.get("/auth", auth, userController.authUser)
+
 router.get("/posts", postController.getPosts)
 
 router.post(
