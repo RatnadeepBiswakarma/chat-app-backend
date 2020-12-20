@@ -2,12 +2,12 @@ const mongodb = require("mongodb")
 const Post = require("../models/post")
 const { validationResult } = require("express-validator")
 const { prepareUserPublicProfile } = require("../util/user")
-const LIMIT = 10
+const LIMIT = 30
 const SKIP = 0
 
 exports.getPosts = (req, res) => {
   let query
-  const dbQueryOptions = { skip: SKIP, limit: LIMIT, sort: "-updated_at" }
+  const dbQueryOptions = { skip: SKIP, limit: LIMIT, sort: "created_at" }
   {
     const queryParams = req.query
     /* if user is doing a search */
@@ -32,18 +32,23 @@ exports.getPosts = (req, res) => {
     it also removes other mongoose methods i.e. save() */
   // populate user details
   query.populate("userId")
-  query.exec().then(posts => {
-    if (posts.length > 0) {
-      posts = Array.from(posts).map(p => p.toObject())
+  query.exec().then(messages => {
+    if (messages.length > 0) {
+      messages = Array.from(messages).map(p => p.toObject())
       /* just to give the data a better shape */
-      posts.forEach(post => {
+      messages.forEach(post => {
         if (post.userId) {
           post.user = prepareUserPublicProfile(post.userId)
           Reflect.deleteProperty(post, "userId")
         }
+        if (post.user.id.toString() === req.userId.toString()) {
+          post.sent_by_me = true
+        } else {
+          post.sent_by_me = false
+        }
       })
     }
-    res.status(200).json({ posts: posts ? posts : [] })
+    res.status(200).json({ messages: messages ? messages : [] })
   })
 }
 
@@ -76,11 +81,10 @@ exports.postPosts = (req, res) => {
       .status(422)
       .json({ message: "Validation Failed!", errors: errors.array() })
   }
-  const { title, content } = req.body
+  const { message } = req.body
 
   let post = new Post({
-    title,
-    content,
+    message,
     created_on: new Date(),
     updated_on: new Date(),
     userId: req.userId,

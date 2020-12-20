@@ -8,21 +8,12 @@ const { body, check } = require("express-validator")
 
 router.get("/auth", auth, userController.authUser)
 
-router.get("/posts", postController.getPosts)
+router.get("/messages", auth, postController.getPosts)
 
 router.post(
   "/posts",
   auth,
-  [
-    check("title").exists().withMessage("is required."),
-    body("title")
-      .isLength({ min: 10 })
-      .withMessage("must be at least 10 characters long."),
-    check("content").exists().withMessage("is required."),
-    body("content")
-      .isLength({ min: 10 })
-      .withMessage("must be at least 10 characters long."),
-  ],
+  [body("message").exists().withMessage("is required.")],
   postController.postPosts
 )
 
