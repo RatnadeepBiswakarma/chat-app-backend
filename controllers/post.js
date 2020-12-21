@@ -2,7 +2,7 @@ const mongodb = require("mongodb")
 const Post = require("../models/post")
 const { validationResult } = require("express-validator")
 const { prepareUserPublicProfile } = require("../util/user")
-const LIMIT = 30
+const LIMIT = 100
 const SKIP = 0
 
 exports.getPosts = (req, res) => {

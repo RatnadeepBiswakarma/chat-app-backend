@@ -4,6 +4,8 @@ const mainRoute = require("./routes/index.js")
 const bodyParser = require("body-parser")
 const MONGODB_URI = "mongodb://127.0.0.1:27017/posts-app"
 const app = express()
+const io = require("./socket.js")
+const ChatHandlers = require("./controllers/chat.js")
 
 const { port } = require("./config")
 
@@ -23,5 +25,9 @@ mongoose.set("useFindAndModify", false)
 console.log("Connecting...")
 mongoose.connect(MONGODB_URI).then(() => {
   console.log("Connected! ✔")
-  app.listen(port)
+  const server = app.listen(port)
+  let socketConnection = io.initSocket(server)
+  socketConnection.on("connection", socket => {
+    socket.chatHandler = new ChatHandlers(server, socket, socketConnection)
+  })
 })
