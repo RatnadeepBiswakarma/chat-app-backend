@@ -19,6 +19,10 @@ const userSchema = new Schema(
       type: String,
       required: true,
     },
+    rooms: {
+      type: Array,
+      required: false,
+    },
   },
   {
     timestamps: { createdAt: "created_at", updatedAt: "updated_at" },

@@ -1,4 +1,6 @@
 const Post = require("../models/post")
+const Room = require("../models/room")
+
 const { prepareUserPublicProfile } = require("../util/user")
 
 module.exports = class ChatHandlers {
@@ -16,10 +18,23 @@ module.exports = class ChatHandlers {
 
   async handleNewMessage(data) {
     console.log("new_message", data)
-    let res = await this.putPost(data.sender_id, data.message)
-    this.io.to(data.send_to).emit("new_message", res.post)
-    res.post.sent_by_me = true
-    this.io.to(data.sender_id).emit("new_message", res.post)
+    let room_id = data.roomId
+    if (!room_id) {
+      const users = [data.target_id, data.sender_id]
+      let message = {
+        text: data.message,
+        sender_id: data.sender_id,
+        date: new Date(),
+      }
+      let new_room = new Room({
+        messages: [message],
+        users,
+      })
+      let room = await new_room.save()
+      room_id = room.id
+      this.socket.join(room_id)
+      this.socket.emit("new_message", data)
+    }
   }
 
   handleNewConnectedUser(userId) {
