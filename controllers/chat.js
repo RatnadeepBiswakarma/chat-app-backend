@@ -1,5 +1,7 @@
 const Post = require("../models/post")
 const Room = require("../models/room")
+const Message = require("../models/message")
+const User = require("../models/user")
 
 const { prepareUserPublicProfile } = require("../util/user")
 
@@ -8,58 +10,75 @@ module.exports = class ChatHandlers {
     this.server = server
     this.socket = socket
     this.io = io
-    this.socket.on("userConnected", data => {
-      this.handleNewConnectedUser(data)
-    })
+    this.socket.join()
     this.socket.on("new_message", data => {
       this.handleNewMessage(data)
     })
   }
 
   async handleNewMessage(data) {
-    console.log("new_message", data)
-    let room_id = data.roomId
-    if (!room_id) {
+    if (data.room_id) {
+      let message = new Message(data)
+      message
+        .save()
+        .then(message => {
+          message = message.toObject()
+          this.io.in(data.room_id).emit("new_message", message)
+        })
+        .catch(err => console.log(err))
+    } else {
       const users = [data.target_id, data.sender_id]
-      let message = {
-        text: data.message,
-        sender_id: data.sender_id,
-        date: new Date(),
-      }
       let new_room = new Room({
-        messages: [message],
         users,
       })
       let room = await new_room.save()
-      room_id = room.id
-      this.socket.join(room_id)
-      this.socket.emit("new_message", data)
+
+      data.room_id = room.id
+      Room.findById(room.id)
+        .populate({ path: "users", select: "first_name last_name id email" })
+        .then(newRoom => {
+          newRoom = newRoom.toObject()
+          this.socket.join(newRoom.id)
+          let message = new Message(data)
+          message
+            .save()
+            .then(message => {
+              message.toObject()
+              this.io.in(newRoom.id).emit("room_created", newRoom)
+            })
+            .catch(err => console.log(err))
+        })
+        .catch(err => {
+          console.log("failed to fetch room", err)
+        })
+      // add the room to booth users' doc
+      this.addRoomToUserDoc(data.target_id, room.id)
+      this.addRoomToUserDoc(data.sender_id, room.id)
     }
   }
 
-  handleNewConnectedUser(userId) {
-    console.log("handleNewConnectedUser", userId)
-    this.socket.join(userId)
+  handleNewConnectedUser(user_id) {
+    User.findById(user_id).then(user => {
+      if (!user) {
+        return
+      }
+      if (user.rooms.length > 0) {
+        user.rooms.forEach(room_id => {
+          this.socket.join(room_id.toString())
+        })
+      }
+    })
   }
 
-  putPost(userId, message) {
-    let post = new Post({
-      message,
-      created_on: new Date(),
-      updated_on: new Date(),
-      userId,
+  addRoomToUserDoc(user_id, room_id) {
+    User.findById(user_id).then(user => {
+      if (!user) {
+        return
+      }
+      user.rooms.push(room_id)
+      user.save().catch(err => {
+        console.log("failed to add room to user doc")
+      })
     })
-    return post
-      .save()
-      .then(post => {
-        return post.populate("userId").execPopulate()
-      })
-      .then(post => {
-        post = post.toObject()
-        /* just to give the data a better shape */
-        post.user = prepareUserPublicProfile(post.userId)
-        Reflect.deleteProperty(post, "userId")
-        return { message: "Post created", post }
-      })
   }
 }

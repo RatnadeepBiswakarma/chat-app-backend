@@ -3,8 +3,9 @@ const Schema = mongoose.Schema
 
 const roomSchema = new Schema(
   {
-    messages: { type: Array, required: false },
-    users: { type: Array, required: true, ref: "User", maxlength: 2 }, // array of user ids
+    users: {
+      type: [{ type: Schema.Types.ObjectId, ref: "User" }],
+    },
   },
   {
     timestamps: { createdAt: "created_at", updatedAt: "updated_at" },
@@ -19,7 +20,5 @@ const roomSchema = new Schema(
     },
   }
 )
-
-roomSchema.index({ title: "text", content: "text" })
 
 module.exports = mongoose.model("Room", roomSchema)

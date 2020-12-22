@@ -91,3 +91,14 @@ exports.postLogin = (req, res) => {
     return res.status(200).json({ user, token })
   })
 }
+
+exports.getUserDetails = (req, res) => {
+  const email = req.params.email
+  User.findOne({ email }).then(user => {
+    if (!user) {
+      return res.status(404).json({ message: "No user found" })
+    }
+    user = user.toObject()
+    return res.status(200).json({ user })
+  })
+}

@@ -1,29 +1,23 @@
 const mongoose = require("mongoose")
 const Schema = mongoose.Schema
 
-const userSchema = new Schema(
+const messageSchema = new Schema(
   {
-    first_name: {
-      type: String,
+    text: {
+      type: Object,
       required: true,
     },
-    last_name: {
-      type: String,
+    room_id: {
+      type: mongoose.Types.ObjectId,
       required: true,
-    },
-    email: {
-      type: String,
-      required: true,
-    },
-    password: {
-      type: String,
-      required: true,
-    },
-    rooms: {
-      type: [mongoose.Types.ObjectId],
-      required: false,
       ref: "Room",
     },
+    sender_id: {
+      type: mongoose.Types.ObjectId,
+      required: true,
+      ref: "User",
+    },
+    date: Date,
   },
   {
     timestamps: { createdAt: "created_at", updatedAt: "updated_at" },
@@ -39,6 +33,6 @@ const userSchema = new Schema(
   }
 )
 
-userSchema.index({ first_name: "text", last_name: "text", email: "text" })
+messageSchema.index({ text: "text" })
 
-module.exports = mongoose.model("User", userSchema)
+module.exports = mongoose.model("Message", messageSchema)

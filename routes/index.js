@@ -4,11 +4,13 @@ const router = express.Router()
 const auth = require("../middlewares/auth")
 const postController = require("../controllers/post")
 const userController = require("../controllers/user")
+const roomController = require("../controllers/room")
 const { body, check } = require("express-validator")
 
 router.get("/auth", auth, userController.authUser)
 
-router.get("/messages", auth, postController.getPosts)
+router.get("/messages/:roomId", auth, roomController.getMessages)
+router.get("/rooms", auth, roomController.getRooms)
 
 router.post(
   "/posts",
@@ -17,7 +19,7 @@ router.post(
   postController.postPosts
 )
 
-router.get("/posts/:postId", postController.getPostById)
+router.get("/users/:email", userController.getUserDetails)
 
 router.post(
   "/users/login",
