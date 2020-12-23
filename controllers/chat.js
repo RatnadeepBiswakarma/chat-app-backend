@@ -14,6 +14,12 @@ module.exports = class ChatHandlers {
     this.socket.on("new_message", data => {
       this.handleNewMessage(data)
     })
+    this.socket.on("typing", data => {
+      this.handleTyping(data)
+    })
+    this.socket.on("no_longer_typing", data => {
+      this.noLongerTyping(data)
+    })
   }
 
   async handleNewMessage(data) {
@@ -54,6 +60,18 @@ module.exports = class ChatHandlers {
       // add the room to booth users' doc
       this.addRoomToUserDoc(data.target_id, room.id)
       this.addRoomToUserDoc(data.sender_id, room.id)
+    }
+  }
+
+  handleTyping(data) {
+    if (data.room_id) {
+      this.socket.to(data.room_id).emit("typing", data)
+    }
+  }
+
+  noLongerTyping(data) {
+    if (data.room_id) {
+      this.io.to(data.room_id).emit("no_longer_typing", data)
     }
   }
 
