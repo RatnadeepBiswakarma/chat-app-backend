@@ -71,7 +71,7 @@ module.exports = class ChatHandlers {
 
   noLongerTyping(data) {
     if (data.room_id) {
-      this.io.to(data.room_id).emit("no_longer_typing", data)
+      this.socket.to(data.room_id).emit("no_longer_typing", data)
     }
   }
 
