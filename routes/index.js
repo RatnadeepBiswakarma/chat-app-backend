@@ -10,6 +10,7 @@ const { body, check } = require("express-validator")
 router.get("/auth", auth, userController.authUser)
 
 router.get("/messages/:roomId", auth, roomController.getMessages)
+router.patch("/messages/:roomId", auth, roomController.patchRead)
 router.get("/rooms", auth, roomController.getRooms)
 
 router.post(

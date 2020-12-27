@@ -17,6 +17,12 @@ const messageSchema = new Schema(
       required: true,
       ref: "User",
     },
+    status: {
+      type: String,
+      required: false,
+      // delivered, read
+      default: "sent",
+    },
     date: Date,
   },
   {
