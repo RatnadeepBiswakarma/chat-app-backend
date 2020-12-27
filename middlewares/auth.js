@@ -11,7 +11,7 @@ module.exports = (req, res, next) => {
   try {
     decodedToken = jwt.verify(token, jwtSecret)
   } catch (err) {
-    return res.status(500).json({
+    return res.status(401).json({
       message: "Invalid user token.",
     })
   }
