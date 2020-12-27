@@ -2,6 +2,7 @@ const Post = require("../models/post")
 const Room = require("../models/room")
 const Message = require("../models/message")
 const User = require("../models/user")
+const Mongoose = require("mongoose")
 
 const { prepareUserPublicProfile } = require("../util/user")
 
@@ -19,6 +20,9 @@ module.exports = class ChatHandlers {
     })
     this.socket.on("no_longer_typing", data => {
       this.noLongerTyping(data)
+    })
+    this.socket.on("read_message", data => {
+      this.updateRead(data)
     })
   }
 
@@ -73,6 +77,17 @@ module.exports = class ChatHandlers {
     if (data.room_id) {
       this.socket.to(data.room_id).emit("no_longer_typing", data)
     }
+  }
+
+  updateRead(data) {
+    Message.updateOne({
+      room_id: Mongoose.Types.ObjectId(data.room_id),
+      sender_id: Mongoose.Types.ObjectId(data.sender_id),
+    })
+      .then(() => {
+        this.socket.to(data.room_id).emit("read_updated", data)
+      })
+      .catch(err => console.log(err))
   }
 
   handleNewConnectedUser(user_id) {
