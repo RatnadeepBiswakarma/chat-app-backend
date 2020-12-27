@@ -14,10 +14,14 @@ exports.getRooms = (req, res) => {
 
 exports.getMessages = (req, res) => {
   const roomId = req.params.roomId
-  Message.find({ room_id: Mongoose.Types.ObjectId(roomId) }).then(messages => {
-    messages.forEach(item => {
-      item = item.toObject()
+  Message.find({ room_id: Mongoose.Types.ObjectId(roomId) })
+    .sort("-created_at")
+    .limit(50)
+    .then(messages => {
+      messages.forEach(item => {
+        item = item.toObject()
+      })
+      messages.reverse()
+      return res.status(200).json({ items: messages })
     })
-    return res.status(200).json({ items: messages })
-  })
 }
