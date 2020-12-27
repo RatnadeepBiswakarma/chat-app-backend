@@ -24,6 +24,9 @@ module.exports = class ChatHandlers {
     this.socket.on("read_message", data => {
       this.updateRead(data)
     })
+    this.socket.on("message_received", data => {
+      this.updateDeliver(data)
+    })
   }
 
   async handleNewMessage(data) {
@@ -79,15 +82,30 @@ module.exports = class ChatHandlers {
     }
   }
 
-  updateRead(data) {
-    Message.updateOne({
-      room_id: Mongoose.Types.ObjectId(data.room_id),
-      sender_id: Mongoose.Types.ObjectId(data.sender_id),
-    })
+  updateMessageStatus(status, data) {
+    Message.updateOne(
+      {
+        room_id: Mongoose.Types.ObjectId(data.room_id),
+        sender_id: Mongoose.Types.ObjectId(data.sender_id),
+      },
+      { status: status }
+    )
       .then(() => {
-        this.socket.to(data.room_id).emit("read_updated", data)
+        if (status === "read") {
+          this.socket.to(data.room_id).emit("read_updated", data)
+        } else if (status === "delivered") {
+          this.socket.to(data.room_id).emit("message_delivered", data)
+        }
       })
       .catch(err => console.log(err))
+  }
+
+  updateRead(data) {
+    this.updateMessageStatus("read", data)
+  }
+
+  updateDeliver(data) {
+    this.updateMessageStatus("delivered", data)
   }
 
   handleNewConnectedUser(user_id) {
