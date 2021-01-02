@@ -1,10 +1,7 @@
-const Post = require("../models/post")
 const Room = require("../models/room")
 const Message = require("../models/message")
 const User = require("../models/user")
 const Mongoose = require("mongoose")
-
-const { prepareUserPublicProfile } = require("../util/user")
 
 module.exports = class ChatHandlers {
   constructor(server, socket, io) {
