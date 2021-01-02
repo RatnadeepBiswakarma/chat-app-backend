@@ -13,7 +13,7 @@ const roomSchema = new Schema(
     // change _id to id
     toObject: {
       transform(doc, ret) {
-        const id = ret._id
+        const id = ret._id.toString()
         Reflect.deleteProperty(ret, "_id")
         ret.id = id
       },

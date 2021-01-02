@@ -51,13 +51,27 @@ module.exports = class ChatHandlers {
         .populate({ path: "users", select: "first_name last_name id email" })
         .then(newRoom => {
           newRoom = newRoom.toObject()
+          newRoom.creator_id = data.sender_id
+          // join target user socket if online
+          const sockets = []
+          this.io.sockets.sockets.forEach(s => {
+            sockets.push(s)
+          })
+          const targetUserSocket = sockets.find(
+            s => s.user_id === data.target_id
+          )
           this.socket.join(newRoom.id)
+          if (targetUserSocket) {
+            targetUserSocket.join(newRoom.id)
+          }
+
           let message = new Message(data)
           message
             .save()
             .then(message => {
-              message.toObject()
+              message = message.toObject()
               this.io.in(newRoom.id).emit("room_created", newRoom)
+              this.io.in(newRoom.id).emit("new_message", message)
             })
             .catch(err => console.log(err))
         })
