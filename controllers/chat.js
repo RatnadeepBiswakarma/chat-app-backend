@@ -148,5 +148,7 @@ module.exports = class ChatHandlers {
 
   addLastMessageToRoom(room_id, message_id) {
     Room.findByIdAndUpdate(room_id, { last_message: message_id })
+      .then(() => {})
+      .catch(err => console.log("Failed to update last msg", err))
   }
 }
