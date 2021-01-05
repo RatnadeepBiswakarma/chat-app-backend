@@ -34,6 +34,7 @@ module.exports = class ChatHandlers {
         .then(message => {
           message = message.toObject()
           this.io.in(data.room_id).emit("new_message", message)
+          this.addLastMessageToRoom(data.room_id, message.id)
         })
         .catch(err => console.log(err))
     } else {
@@ -69,6 +70,7 @@ module.exports = class ChatHandlers {
               message = message.toObject()
               this.io.in(newRoom.id).emit("room_created", newRoom)
               this.io.in(newRoom.id).emit("new_message", message)
+              this.addLastMessageToRoom(newRoom.id, message.id)
             })
             .catch(err => console.log(err))
         })
@@ -142,5 +144,9 @@ module.exports = class ChatHandlers {
         console.log("failed to add room to user doc")
       })
     })
+  }
+
+  addLastMessageToRoom(room_id, message_id) {
+    Room.findByIdAndUpdate(room_id, { last_message: message_id })
   }
 }
