@@ -44,6 +44,7 @@ exports.signupUser = (req, res) => {
       last_name,
       email,
       password,
+      last_online: new Date(),
     })
     newUser
       .save()

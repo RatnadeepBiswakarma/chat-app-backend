@@ -24,6 +24,10 @@ const userSchema = new Schema(
       required: false,
       ref: "Room",
     },
+    last_online: {
+      type: Date,
+      required: true,
+    },
   },
   {
     timestamps: { createdAt: "created_at", updatedAt: "updated_at" },

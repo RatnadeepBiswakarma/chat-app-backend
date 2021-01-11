@@ -27,6 +27,9 @@ module.exports = class ChatHandlers {
     this.socket.on("all_messages_delivered", data =>
       this.markAllMessageAsDelivered(data)
     )
+    this.socket.on("disconnect", () => {
+      this.handleUserDisconnect()
+    })
   }
 
   async handleNewMessage(data) {
@@ -157,6 +160,7 @@ module.exports = class ChatHandlers {
           this.socket.join(room_id.toString())
         })
       }
+      this.updateLastOnlineTime(user_id)
     })
   }
 
@@ -176,5 +180,18 @@ module.exports = class ChatHandlers {
     Room.findByIdAndUpdate(room_id, { last_message: message_id })
       .then(() => {})
       .catch(err => console.log("Failed to update last msg", err))
+  }
+
+  handleUserDisconnect() {
+    // update user last_online on disconnect
+    this.updateLastOnlineTime(this.socket.user_id)
+  }
+
+  updateLastOnlineTime(user_id) {
+    User.findByIdAndUpdate(user_id, { last_online: new Date() })
+      .then(() => {
+        // do nothing
+      })
+      .catch(err => console.log(err))
   }
 }

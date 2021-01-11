@@ -2,7 +2,7 @@ const Room = require("../models/room")
 
 exports.getRooms = (req, res) => {
   Room.find({ users: req.userId })
-    .populate({ path: "users", select: "first_name last_name id email" })
+    .populate({ path: "users", select: "first_name last_name id email last_online" })
     .populate("last_message")
     .then(rooms => {
       rooms = rooms.map(item => item.toObject())
