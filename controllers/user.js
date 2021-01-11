@@ -9,16 +9,12 @@ const errorFormatter = ({ msg, param }) => {
 
 exports.authUser = (req, res) => {
   User.findById(req.userId)
+    .select("first_name last_name id email")
     .then(user => {
       if (!user) {
         return res.status(404).json({ message: `User not found` })
       }
-      user = {
-        first_name: user.first_name,
-        last_name: user.last_name,
-        id: user.id,
-        email: user.email,
-      }
+      user = user.toObject()
       return res.status(200).json({ user })
     })
     .catch(err => {
