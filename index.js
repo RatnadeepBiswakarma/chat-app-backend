@@ -30,7 +30,7 @@ mongoose.connect(MONGODB_URI).then(() => {
   socketConnection.on("connection", socket => {
     // store user id
     socket.user_id = socket.handshake.auth.userId
-    socket.chatHandler = new ChatHandlers(server, socket, socketConnection)
-    socket.chatHandler.handleNewConnectedUser(socket.user_id)
+    const chatHandler = new ChatHandlers(server, socket, socketConnection)
+    chatHandler.handleNewConnectedUser(socket.user_id)
   })
 })
