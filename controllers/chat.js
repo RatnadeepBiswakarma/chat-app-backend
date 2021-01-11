@@ -24,6 +24,9 @@ module.exports = class ChatHandlers {
     this.socket.on("message_received", data => {
       this.updateDeliver(data)
     })
+    this.socket.on("all_messages_delivered", data =>
+      this.markAllMessageAsDelivered(data)
+    )
   }
 
   async handleNewMessage(data) {
@@ -119,6 +122,29 @@ module.exports = class ChatHandlers {
 
   updateDeliver(data) {
     this.updateMessageStatus("delivered", data)
+  }
+
+  markAllMessageAsDelivered(data) {
+    Message.updateMany(
+      { target_id: data.user_id, status: "sent" },
+      { status: "delivered" }
+    )
+      .then(result => {
+        if (result.nModified > 0) {
+          User.findById(data.user_id)
+            .select("rooms")
+            .then(user => {
+              if (!user) return
+              // notify all the rooms for message delivery
+              user.rooms.forEach(room_id => {
+                room_id = room_id.toString()
+                this.io.in(room_id).emit("all_messages_delivered", { room_id })
+              })
+            })
+            .catch(err => console.log(err))
+        }
+      })
+      .catch(err => console.log("err", err))
   }
 
   handleNewConnectedUser(user_id) {

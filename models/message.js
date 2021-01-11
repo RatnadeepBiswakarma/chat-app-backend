@@ -17,6 +17,11 @@ const messageSchema = new Schema(
       required: true,
       ref: "User",
     },
+    target_id: {
+      type: mongoose.Types.ObjectId,
+      required: true,
+      ref: "User",
+    },
     status: {
       type: String,
       required: false,
