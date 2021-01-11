@@ -25,7 +25,7 @@ module.exports = {
     "block-spacing": "error",
     "brace-style": ["error", "1tbs"],
     camelcase: [
-      "error",
+      "off",
       {
         ignoreDestructuring: true,
         properties: "never",
