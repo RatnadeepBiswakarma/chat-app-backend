@@ -34,15 +34,7 @@ module.exports = class ChatHandlers {
 
   async handleNewMessage(data) {
     if (data.room_id) {
-      let message = new Message(data)
-      message
-        .save()
-        .then(message => {
-          message = message.toObject()
-          this.io.in(data.room_id).emit("new_message", message)
-          this.addLastMessageToRoom(data.room_id, message.id)
-        })
-        .catch(err => console.log(err))
+      this.createNewMessage(data, data.room_id)
     } else {
       const users = [data.target_id, data.sender_id]
       let new_room = new Room({
@@ -68,17 +60,8 @@ module.exports = class ChatHandlers {
           if (targetUserSocket) {
             targetUserSocket.join(newRoom.id)
           }
-
-          let message = new Message(data)
-          message
-            .save()
-            .then(message => {
-              message = message.toObject()
-              this.io.in(newRoom.id).emit("room_created", newRoom)
-              this.io.in(newRoom.id).emit("new_message", message)
-              this.addLastMessageToRoom(newRoom.id, message.id)
-            })
-            .catch(err => console.log(err))
+          this.io.in(newRoom.id).emit("room_created", newRoom)
+          this.createNewMessage(data, newRoom.id)
         })
         .catch(err => {
           console.log("failed to fetch room", err)
@@ -87,6 +70,18 @@ module.exports = class ChatHandlers {
       this.addRoomToUserDoc(data.target_id, room.id)
       this.addRoomToUserDoc(data.sender_id, room.id)
     }
+  }
+
+  createNewMessage(payload, room_id) {
+    let message = new Message(payload)
+    message
+      .save()
+      .then(message => {
+        message = message.toObject()
+        this.io.in(room_id).emit("new_message", message)
+        this.addLastMessageToRoom(room_id, message.id)
+      })
+      .catch(err => console.log(err))
   }
 
   handleTyping(data) {
