@@ -4,12 +4,13 @@ const router = express.Router()
 const auth = require("../middlewares/auth")
 const userController = require("../controllers/user")
 const roomController = require("../controllers/room")
+const messageController = require("../controllers/message")
 const { body, check } = require("express-validator")
 
 router.get("/auth", auth, userController.authUser)
 
-router.get("/messages/:roomId", auth, roomController.getMessages)
-router.patch("/messages/:roomId", auth, roomController.patchRead)
+router.get("/messages/:roomId", auth, messageController.getMessages)
+router.patch("/messages/:roomId", auth, messageController.patchRead)
 router.get("/rooms", auth, roomController.getRooms)
 
 router.get("/users/:email", userController.getUserDetails)
