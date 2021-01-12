@@ -8,7 +8,9 @@ module.exports = class ChatHandlers {
     this.server = server
     this.socket = socket
     this.io = io
+    this.onlineUsers = {}
     this.socket.join()
+
     this.socket.on("new_message", data => {
       this.handleNewMessage(data)
     })
@@ -29,6 +31,9 @@ module.exports = class ChatHandlers {
     )
     this.socket.on("disconnect", () => {
       this.handleUserDisconnect()
+    })
+    this.socket.on("user_online_status", data => {
+      this.handleUserOnlineStatusChange(data)
     })
   }
 
@@ -180,6 +185,10 @@ module.exports = class ChatHandlers {
   handleUserDisconnect() {
     // update user last_online on disconnect
     this.updateLastOnlineTime(this.socket.user_id)
+    this.handleUserOnlineStatusChange({
+      status: false,
+      user_id: this.socket.user_id,
+    })
   }
 
   updateLastOnlineTime(user_id) {
@@ -188,5 +197,30 @@ module.exports = class ChatHandlers {
         // do nothing
       })
       .catch(err => console.log(err))
+  }
+
+  handleUserOnlineStatusChange(data) {
+    this.onlineUsers[data.user_id] = data.status
+    Room.find({ users: data.user_id })
+      .select("id")
+      .then(rooms => {
+        if (!rooms) {
+          return
+        }
+        rooms.forEach(room => {
+          room = room.toObject()
+          // send last_online, FE will update local data
+          this.socket.to(room.id.toString()).emit("user_online_status", {
+            ...data,
+            room_id: room.id,
+            last_online: new Date(),
+          })
+        })
+      })
+      .catch(err => console.log(err))
+    // when user goes offline, last_online is updated
+    if (!data.status) {
+      this.updateLastOnlineTime(data.user_id)
+    }
   }
 }
