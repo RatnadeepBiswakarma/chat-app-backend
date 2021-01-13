@@ -2,6 +2,7 @@ const Room = require("../models/room")
 const Message = require("../models/message")
 const User = require("../models/user")
 const Mongoose = require("mongoose")
+const { hasKey } = require("../util/object")
 
 module.exports = class ChatHandlers {
   constructor(server, socket, io) {
@@ -34,6 +35,9 @@ module.exports = class ChatHandlers {
     })
     this.socket.on("user_online_status", data => {
       this.handleUserOnlineStatusChange(data)
+    })
+    this.socket.on("get_unread_messages", () => {
+      this.getUnreadMessages()
     })
   }
 
@@ -222,5 +226,24 @@ module.exports = class ChatHandlers {
     if (!data.status) {
       this.updateLastOnlineTime(data.user_id)
     }
+  }
+
+  getUnreadMessages() {
+    const { user_id } = this.socket
+    Message.find({
+      target_id: user_id,
+      status: { $in: ["sent", "delivered"] },
+    }).then(result => {
+      let unreadList = {}
+      result.forEach(item => {
+        if (hasKey(unreadList, item.room_id)) {
+          unreadList[item.room_id].count += 1
+          unreadList[item.room_id].message = item.toObject()
+        } else {
+          unreadList[item.room_id] = { count: 1, message: item.toObject() }
+        }
+      })
+      this.socket.emit("unread_messages", { unreads: unreadList })
+    })
   }
 }
