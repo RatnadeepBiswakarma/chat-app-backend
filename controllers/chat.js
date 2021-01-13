@@ -106,13 +106,18 @@ module.exports = class ChatHandlers {
   }
 
   updateMessageStatus(status, data) {
-    Message.updateOne(
-      {
-        room_id: Mongoose.Types.ObjectId(data.room_id),
-        sender_id: Mongoose.Types.ObjectId(data.sender_id),
-      },
-      { status: status }
-    )
+    const query = {
+      room_id: Mongoose.Types.ObjectId(data.room_id),
+      sender_id: Mongoose.Types.ObjectId(data.sender_id),
+    }
+    // only mark sent messages as delivered
+    if (status === "delivered") {
+      query.status = "sent"
+    } else {
+      // else mark all sent and delivered msgs as read
+      query.status = { $in: ["sent", "delivered"] }
+    }
+    Message.updateMany(query, { status })
       .then(() => {
         if (status === "read") {
           this.socket.to(data.room_id).emit("read_updated", data)
