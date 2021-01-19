@@ -6,6 +6,7 @@ const { MONGODB_URI } = require("./config")
 const app = express()
 const io = require("./socket.js")
 const ChatHandlers = require("./controllers/chat.js")
+const User = require("./models/user")
 
 const { port } = require("./config")
 
@@ -32,5 +33,19 @@ mongoose.connect(MONGODB_URI).then(() => {
     socket.user_id = socket.handshake.auth.userId
     const chatHandler = new ChatHandlers(server, socket, socketConnection)
     chatHandler.handleNewConnectedUser(socket.user_id)
+  })
+  User.findOne({ email: "sage@chatapp.com" }).then(user => {
+    if (user) {
+      return
+    }
+    // create the bot user not present
+    const bot = new User({
+      first_name: "The",
+      last_name: "Sage",
+      email: "sage@chatapp.com",
+      password: "do I need a password?",
+      last_online: new Date(),
+    })
+    bot.save()
   })
 })
