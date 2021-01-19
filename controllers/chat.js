@@ -3,6 +3,7 @@ const Message = require("../models/message")
 const User = require("../models/user")
 const Mongoose = require("mongoose")
 const { hasKey } = require("../util/object")
+const quotes = require("../data/quotes")
 
 module.exports = class ChatHandlers {
   constructor(server, socket, io) {
@@ -44,6 +45,11 @@ module.exports = class ChatHandlers {
   async handleNewMessage(data) {
     if (data.room_id) {
       this.createNewMessage(data, data.room_id)
+      if (data.sage) {
+        setTimeout(() => {
+          this.sendReplayFromSage(data)
+        }, 500)
+      }
     } else {
       const users = [data.target_id, data.sender_id]
       let new_room = new Room({
@@ -277,7 +283,8 @@ module.exports = class ChatHandlers {
             }
             this.io.in(newRoom.id).emit("room_created", newRoom)
             const msg = {
-              text: "hello this is bot user",
+              text:
+                "Hey! good you see you here 😃. You can chat with me, share some quick notes, I'll keep them safe. Do you know I like to spread knowledge, obviously copied but useful.",
               room_id: newRoom.id,
               sender_id: bot_id,
               target_id: user_id,
@@ -287,5 +294,19 @@ module.exports = class ChatHandlers {
           })
       })
     })
+  }
+
+  sendReplayFromSage(data) {
+    const target_id = data.target_id
+    data.target_id = data.sender_id
+    data.sender_id = target_id
+    data.text = this.getRandomQuoteMessage()
+    this.createNewMessage(data, data.room_id)
+  }
+
+  getRandomQuoteMessage() {
+    const randomIndex = Math.floor(Math.random() * (quotes.length - 1) + 1)
+    const quote = quotes[randomIndex]
+    return `${quote.quote} \n - ${quote.author}`
   }
 }
