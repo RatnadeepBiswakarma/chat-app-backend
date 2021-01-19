@@ -45,7 +45,7 @@ module.exports = class ChatHandlers {
   async handleNewMessage(data) {
     if (data.room_id) {
       this.createNewMessage(data, data.room_id)
-      if (data.sage) {
+      if (data.sage && data.text === "q") {
         setTimeout(() => {
           this.sendReplayFromSage(data)
         }, 500)
@@ -284,7 +284,7 @@ module.exports = class ChatHandlers {
             this.io.in(newRoom.id).emit("room_created", newRoom)
             const msg = {
               text:
-                "Hey! good you see you here 😃. You can chat with me, share some quick notes, I'll keep them safe. Do you know I like to spread knowledge, obviously copied but useful.",
+                "Hey! good you see you here 😃. You can chat with me, share some quick notes, I'll keep them safe. Do you know I like to spread knowledge, obviously copied but useful. You can send me q to get random quote",
               room_id: newRoom.id,
               sender_id: bot_id,
               target_id: user_id,
