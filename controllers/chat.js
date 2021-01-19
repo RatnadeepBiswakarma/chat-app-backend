@@ -45,7 +45,7 @@ module.exports = class ChatHandlers {
   async handleNewMessage(data) {
     if (data.room_id) {
       this.createNewMessage(data, data.room_id)
-      if (data.sage && data.text === "q") {
+      if (data.sage && data.text.toLowerCase() === "q") {
         setTimeout(() => {
           this.sendReplayFromSage(data)
         }, 500)
