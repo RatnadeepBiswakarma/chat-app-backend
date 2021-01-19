@@ -168,6 +168,8 @@ module.exports = class ChatHandlers {
         user.rooms.forEach(room_id => {
           this.socket.join(room_id.toString())
         })
+      } else {
+        this.addBotUserForUser(user_id)
       }
       this.updateLastOnlineTime(user_id)
     })
@@ -249,6 +251,41 @@ module.exports = class ChatHandlers {
         }
       })
       this.socket.emit("unread_messages", { unreads: unreadList })
+    })
+  }
+
+  addBotUserForUser(user_id) {
+    User.findOne({ email: "sage@chatapp.com" }).then(bot => {
+      const bot_id = bot.id.toString()
+      let new_room = new Room({
+        users: [bot_id, user_id],
+      })
+      new_room.save().then(room => {
+        Room.findById(room.id)
+          .populate({ path: "users", select: "first_name last_name id email" })
+          .then(newRoom => {
+            newRoom = newRoom.toObject()
+            // join target user socket if online
+            const sockets = []
+            this.io.sockets.sockets.forEach(s => {
+              sockets.push(s)
+            })
+            const targetUserSocket = sockets.find(s => s.user_id === user_id)
+            this.socket.join(newRoom.id)
+            if (targetUserSocket) {
+              targetUserSocket.join(newRoom.id)
+            }
+            this.io.in(newRoom.id).emit("room_created", newRoom)
+            const msg = {
+              text: "hello this is bot user",
+              room_id: newRoom.id,
+              sender_id: bot_id,
+              target_id: user_id,
+            }
+            this.createNewMessage(msg, newRoom.id)
+            this.addRoomToUserDoc(user_id, newRoom.id)
+          })
+      })
     })
   }
 }
