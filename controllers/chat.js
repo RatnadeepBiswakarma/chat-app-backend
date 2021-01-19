@@ -284,7 +284,7 @@ module.exports = class ChatHandlers {
             this.io.in(newRoom.id).emit("room_created", newRoom)
             const msg = {
               text:
-                "Hey! good you see you here 😃. You can chat with me, share some quick notes, I'll keep them safe. Do you know I like to spread knowledge, obviously copied but useful. You can send me q to get random quote",
+                "Hey! good you see you here 😃. You can chat with me, share some quick notes, I'll keep them safe. \nClick on the add button to add your friends to chat. \nDo you know I like to spread knowledge, obviously copied but useful. You can send me q to get random quote",
               room_id: newRoom.id,
               sender_id: bot_id,
               target_id: user_id,
