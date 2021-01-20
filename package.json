@@ -5,7 +5,7 @@
   "license": "MIT",
   "author": "ratnadeep",
   "scripts": {
-    "start": "nodemon index.js",
+    "start": "node index.js",
     "serve": "nodemon index.js",
     "start-server": "node index.js",
     "lint-files": "yarn lint-staged"
