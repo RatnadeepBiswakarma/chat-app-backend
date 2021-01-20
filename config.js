@@ -4,6 +4,6 @@ dotenvExpand(myEnv)
 module.exports = {
   mode: process.env.NODE_ENV,
   jwtSecret: process.env.NODE_JWT_SECRET,
-  port: 5050,
+  port: process.env.$PORT || 5050,
   MONGODB_URI: process.env.MONGODB_URI
 }
