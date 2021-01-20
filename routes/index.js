@@ -49,4 +49,8 @@ router.post(
   userController.signupUser
 )
 
+router.get("/", (req, res) => {
+  res.status(404).json({ message: "Not found" })
+})
+
 module.exports = router
