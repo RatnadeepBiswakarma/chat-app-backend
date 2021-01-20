@@ -1,13 +1,13 @@
 {
   "name": "rest-api",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "main.js",
   "license": "MIT",
   "author": "ratnadeep",
   "scripts": {
-    "start": "nodemon index.js",
-    "serve": "nodemon index.js",
-    "start-server": "node index.js",
+    "start": "nodemon main.js",
+    "serve": "nodemon main.js",
+    "start-server": "node main.js",
     "lint-files": "yarn lint-staged"
   },
   "dependencies": {
