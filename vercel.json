@@ -1,4 +1,9 @@
 {
   "public": false,
-  "rewrites": [{ "source": "/(.*)", "destination": "/routes" }]
+  "routes": [
+        {
+            "src": "/(.*)",
+            "dest": "/"
+        }
+    ]
 }
