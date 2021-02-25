@@ -40,6 +40,10 @@ module.exports = class ChatHandlers {
     this.socket.on("get_unread_messages", () => {
       this.getUnreadMessages()
     })
+
+    this.socket.on("call_disconnected", data => {
+      this.handleCallDisconnect(data)
+    })
   }
 
   async handleNewMessage(data) {
@@ -239,6 +243,10 @@ module.exports = class ChatHandlers {
     if (!data.status) {
       this.updateLastOnlineTime(data.user_id)
     }
+  }
+
+  handleCallDisconnect(data) {
+    this.socket.to(data.room_id).emit("call_disconnected", data)
   }
 
   getUnreadMessages() {
