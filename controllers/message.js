@@ -3,13 +3,14 @@ const Mongoose = require("mongoose")
 
 exports.getMessages = (req, res) => {
   const roomId = req.params.roomId
+  const skip = Number(req.query.skip) || 0
+  const limit = Number(req.query.limit) || 40
   Message.find({ room_id: Mongoose.Types.ObjectId(roomId) })
     .sort("-created_at")
-    .limit(50)
+    .limit(limit)
+    .skip(skip)
     .then(messages => {
-      messages.forEach(item => {
-        item = item.toObject()
-      })
+      messages = messages.map(item => item.toObject())
       messages.reverse()
       return res.status(200).json({ items: messages })
     })
