@@ -107,11 +107,13 @@ exports.postLogin = (req, res) => {
 
 exports.getUserDetails = (req, res) => {
   const email = req.params.email
-  User.findOne({ email }).then(user => {
-    if (!user) {
-      return res.status(404).json({ message: "No user found" })
+  User.findOne({ email }, { password: 0, created_at: 0, updated_at: 0 }).then(
+    user => {
+      if (!user) {
+        return res.status(404).json({ message: "No user found" })
+      }
+      user = user.toObject()
+      return res.status(200).json({ user })
     }
-    user = user.toObject()
-    return res.status(200).json({ user })
-  })
+  )
 }
