@@ -48,6 +48,10 @@ router.post(
   userController.signupUser
 )
 
+router.get("/ping", (req, res) => {
+  res.status(200).json({ message: "OK" })
+})
+
 router.get("/", (req, res) => {
   res.status(404).json({ message: "Not found" })
 })
