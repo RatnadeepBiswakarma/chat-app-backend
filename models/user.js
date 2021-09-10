@@ -28,6 +28,10 @@ const userSchema = new Schema(
       type: Date,
       required: true,
     },
+    browser_notification: {
+      type: Boolean,
+      required: false,
+    },
   },
   {
     timestamps: { createdAt: "created_at", updatedAt: "updated_at" },

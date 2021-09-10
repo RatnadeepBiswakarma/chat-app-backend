@@ -10,7 +10,7 @@ const errorFormatter = ({ msg, param }) => {
 
 exports.authUser = (req, res) => {
   User.findById(req.userId)
-    .select("first_name last_name id email")
+    .select("first_name last_name id email browser_notification")
     .then(user => {
       if (!user) {
         return res.status(404).json({ message: `User not found` })
@@ -116,4 +116,27 @@ exports.getUserDetails = (req, res) => {
       return res.status(200).json({ user })
     }
   )
+}
+
+exports.updateUserPreference = async (req, res) => {
+  try {
+    const user = await User.findOne(req.userId)
+    if (!user) {
+      return res.status(404).json({ message: "No user found" })
+    }
+    const update = {}
+    if (Reflect.has(req.body, "browser_notification")) {
+      update.browser_notification = req.body.browser_notification
+      await User.updateOne({ _id: req.userId }, { ...update })
+      return res
+        .status(200)
+        .json({ message: "User preference updated", ...update })
+    }
+    return res
+      .status(422)
+      .json({ message: "Request payload is missing or invalid" })
+  } catch (error) {
+    console.error(error)
+    return res.status(500).json({ message: "Failed to update user preference" })
+  }
 }

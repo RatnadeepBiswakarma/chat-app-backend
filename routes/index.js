@@ -47,6 +47,7 @@ router.post(
   ],
   userController.signupUser
 )
+router.post("/users/preference", auth, userController.updateUserPreference)
 
 router.get("/ping", (req, res) => {
   res.status(200).json({ message: "OK" })
